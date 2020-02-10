@@ -1,0 +1,115 @@
+import discord
+from discord.ext import commands, tasks
+import time
+import random
+
+bot = commands.Bot(command_prefix='%')
+bot.remove_command('help')
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game("Tigerfuzz's vids on max volume"))
+    print("Tigerfuzz.exe has started up and is ready to execute.")
+
+@bot.command()
+async def help(ctx):
+
+    embed = discord.Embed(color=discord.Color.blue(), title="Help", description="Command prefix = %")
+
+    embed.set_author(name="Tigerfuzz.exe", icon_url="https://media.discordapp.net/attachments/650580754220187698/662373644348948503/157784949510133521.jpg")
+    embed.set_thumbnail(url="https://media.discordapp.net/attachments/650580754220187698/662373644348948503/157784949510133521.jpg")
+    embed.add_field(name="**ping**", value="returns latency", inline=False)
+    embed.add_field(name="**yt**", value="gives list of epic youtubers", inline=False)
+    embed.add_field(name="**8ball**", value="prophetically determines an answer to your yes or no question", inline=False)
+    embed.add_field(name="**eraserflip**", value="an eraser is flipped and determines an answer to your question", inline=False)
+    embed.add_field(name="**yelper**", value="rates the thing you input out of 10", inline=False)
+    embed.add_field(name="**randint**", value="picks an integer in between two given values", inline=False)
+    embed.set_footer(text="Tigerfuzz.exe™ V1.1")
+
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f'Pong! {round(bot.latency * 1000)}ms coming right back at you!')
+
+@bot.command(aliases=['youtubers', 'youtube', 'ytchannels'])
+async def yt(ctx):
+    await ctx.send("Epic Youtubers Worth Subbing To:")
+    await ctx.send("https://www.youtube.com/channel/UCPxPB7X4nzbTajB0neWXnHA?view_as=subscriber")
+    await ctx.send("https://www.youtube.com/channel/UC_71CnqXkknzGzKXN_VO-pQ?view_as=subscriber")
+    await ctx.send("https://www.youtube.com/channel/UC7YS_w5DP_kWcQOM6aN_7WA")
+    await ctx.send("Sub to them to get 69 years of good luck.")
+
+@bot.command(aliases=['8ball', 'ask8ball'])
+async def magic8ball(ctx, *, magicballquestion):
+    magicballanswers = ["Definitely", "Yes", "Maybe", "Likely", "Try Again", "Ask Again Later", "Not Likely", "No", "Surely Not"]
+    await ctx.send("Ok, you asked 8ball: " + str(magicballquestion))
+    randans = random.choice(magicballanswers)
+    time.sleep(1)
+    await ctx.send("8ball's response: " + str(randans))
+
+@bot.command()
+async def eraserflip(ctx, *, eraserflipquestion):
+    erasersides = ["the former", "the latter", "either", "neither", "both", "unknown"]
+    await ctx.send("Ok, Eraser is now processing and determining the answer for your question '" + str(eraserflipquestion) + "'")
+    time.sleep(1)
+    await ctx.send("Eraser flipping...")
+    time.sleep(2)
+    landedside = random.choice(erasersides)
+    await ctx.send("Eraser has determined that the answer is " + str(landedside))
+
+@bot.command()
+async def yelper(ctx, *, yelperquestion):
+    rates = ["1", "2", "3", "4", "4", "5", "5", "6", "6", "7", "7", "8", "9", "10"]
+    await ctx.send("Thanks for your input, Yelper will now rate " + "'" + str(yelperquestion) + "'")
+    time.sleep(1)
+    await ctx.send("Rating...")
+    time.sleep(2)
+    randrate = random.choice(rates)
+    await ctx.send("Yelper's rating: " + str(randrate) + "/10")
+
+@bot.command()
+async def randint(ctx, randint1, randint2):
+    randintg = random.randint(int(randint1), int(randint2))
+    await ctx.send(str(randintg))
+
+@bot.command()
+async def howgay(ctx, tag=None):
+    gaylvl = random.randint(0, 100)
+    if tag==None:
+        embed = discord.Embed(color=discord.Color.blue(), title="gay r8 machine", description= "You are " + str(gaylvl) + "% gay")
+    if tag!=None:
+        embed = discord.Embed(color=discord.Color.blue(), title="gay r8 machine", description= str(tag.rstrip("@")) + " is " + str(gaylvl) + "% gay")
+
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def clear(ctx, clramt=5):
+    await ctx.channel.purge(limit=clramt + 1)
+    await ctx.send(str(clramt) + " messages were yoinked. Are ya happy boi?")
+    time.sleep(2.25)
+    await ctx.channel.purge(limit=1)
+
+@bot.command()
+async def kick(ctx, member : discord.Member, *, reason=None):
+    await member.kick(reason=reason)
+    await ctx.send(str(member) + " has been kicked from the server for " + str(reason) + ".")
+
+@bot.command()
+async def ban(ctx, member : discord.Member, *, reason=None):
+    await member.ban(reason=reason)
+    await ctx.send(str(member) + " has been banned from the server for " + str(reason) + ".")
+
+@bot.command()
+async def unban(ctx, *, member):
+    banlist = await ctx.guild.bans()
+    membername, membertag = member.split("#")
+
+    for banentry in banlist:
+        user = banentry.user
+        if (membername, membertag) == (user.name, user.discriminator):
+            await ctx.guild.unban(user)
+            await ctx.send(str(user.name)+ "#" + str(user.discriminator) + " has been unbanned from the server.")
+
+#didn't add token because I don't want anyone hacking my bot
+bot.run()
